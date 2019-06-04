@@ -346,6 +346,7 @@ bool IPXACTReader::parseRegister(const pugi::xml_node& elem, Component& componen
     Number* regaddr = NULL;
     Number* dimensions = NULL;
     bool has_bits = false;
+    const char* typeName = NULL;
 
     // First pass: find component name
     for (xml_node current = elem.first_child(); current && status; current = current.next_sibling())
@@ -355,6 +356,7 @@ bool IPXACTReader::parseRegister(const pugi::xml_node& elem, Component& componen
             if(current.child_value())
             {
                 regname = current.child_value();
+                printf("Parsing registers for %s\n", regname.c_str());
             }
             else
             {
@@ -370,6 +372,16 @@ bool IPXACTReader::parseRegister(const pugi::xml_node& elem, Component& componen
                 regaddr = new Number(current.child_value());
             }
         }
+
+        if(string(current.name()) == "ipxact:typeIdentifier")
+        {
+            if(current.child_value())
+            {
+                typeName = current.child_value();
+            }
+
+        }
+
 
         if(string(current.name()) == "ipxact:dim")
         {
@@ -420,6 +432,29 @@ bool IPXACTReader::parseRegister(const pugi::xml_node& elem, Component& componen
     // Second pass.
     if(reg)
     {
+        bool hasID = false;
+        if(typeName)
+        {
+            string typeID = typeName;
+            Register* source_element = component.getElementWithTypeID(typeID);
+
+            if(source_element)
+            {
+                // Already exist, copy everything we need.
+                reg->setTypeID(typeName, source_element->getName());
+
+                reg->setWidth(source_element->getWidth());
+                reg->setDimensions(source_element->getDimensions());
+                // reg->
+                hasID = true;
+            }
+        }
+
+        if(typeName && !hasID)
+        {
+            // First element with this type name.
+            reg->setTypeID(typeName, reg->getName());
+        }
         // if(!update) cout << "  Created register "  << regname << endl;
         // else        cout << "  Updating register " << regname << endl;
         if(dimensions)
@@ -466,6 +501,12 @@ bool IPXACTReader::parseRegister(const pugi::xml_node& elem, Component& componen
 
             if(string(current.name()) == "ipxact:field")
             {
+                if(hasID)
+                {
+                    printf("Error: ipxact:field not allowed with a typeIdentifier.\n");
+                    exit(1);
+                }
+
                 if(!parseRegisterBitmap(current, *reg, update))
                 {
                     status = false;

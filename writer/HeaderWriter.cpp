@@ -147,8 +147,12 @@ string HeaderWriter::serialize_enum_definition(Component& component, Register& r
 {
     string enumname = thisenum.getName();
     string bitmapname = bitmap.getName();
-    string regname = reg.getName();
-    string componentname = component.getName();
+
+    string registerTypeID   = reg.getTypeID();
+    string componentTypeID  = component.getTypeID();
+
+    string regname          = registerTypeID.empty() ? reg.getName() : registerTypeID;
+    string componentname    = componentTypeID.empty() ? component.getName() : componentTypeID;
 
     escape(enumname);
     escape(bitmapname);
@@ -556,26 +560,25 @@ string HeaderWriter::serialize_register_definition(Component& component, Registe
     string defregname = regname;
     decl <<  "#define REG_" << componentname << "_" << escape(defregname) << " ((volatile " <<  type(reg.getWidth(), false) << "*)0x" << std::hex << (component.getBase() + reg.getAddr()) << ") /* " << reg.getDescription() << " */" << endl;
 
-
-    if(!reg.get().empty())
+    if(!(component.isTypeIDCopy() || reg.isTypeIDCopy()))
     {
-        const std::list<RegisterBitmap*>& bits = reg.get();
-        std::list<RegisterBitmap*>::const_iterator bits_it;
-        for(bits_it = bits.begin(); bits_it != bits.end(); bits_it++)
+        if(!reg.get().empty())
         {
-            RegisterBitmap* bit = *bits_it;
-            if(bit)
+            const std::list<RegisterBitmap*>& bits = reg.get();
+            std::list<RegisterBitmap*>::const_iterator bits_it;
+            for(bits_it = bits.begin(); bits_it != bits.end(); bits_it++)
             {
-                bit->sort();
-                decl << serialize_bitmap_definition(component, reg, *bit, reg.getWidth());
+                RegisterBitmap* bit = *bits_it;
+                if(bit)
+                {
+                    bit->sort();
+                    decl << serialize_bitmap_definition(component, reg, *bit, reg.getWidth());
+                }
             }
-        }
 
-         decl << endl;
-     }
+             decl << endl;
+         }
 
-    if(!component.isTypeIDCopy())
-    {
         decl << indent() << "/** @brief Register definition for @ref " << componentType << "." << camelcase(regname) << ". */" << endl;
         decl << indent() << "typedef register_container " << registerType << " {" << endl;
         indent(1);

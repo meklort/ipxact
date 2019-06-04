@@ -207,6 +207,11 @@ void IPXACTWriter::serialize_register_declaration(xml_node& elem, Register& reg)
 	hexAddr << "0x" << std::hex << reg.getAddr();
 	insertElement(addr, "ipxact:addressOffset", hexAddr.str());
 
+	if(!reg.getTypeID().empty())
+	{
+		insertElement(addr, "ipxact:typeIdentifier", reg.getTypeID());
+	}
+
 	if(reg.getDimensions() > 1)
 	{
 		ostringstream hexDims;
