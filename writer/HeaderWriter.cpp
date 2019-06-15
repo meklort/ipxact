@@ -974,12 +974,52 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
         decl << indent() << "void print()" << endl;
         decl << indent() << "{" << endl;
         indent(1);
+        prevreg = NULL;
         for(it = regs.begin(); it != regs.end(); it++)
         {
             Register* reg = *it;
 
             if(reg)
             {
+                // Ensure we don't have any gaps.
+                int padding = 0;
+                int expStart = 0;
+                if(prevreg)
+                {
+                    int width = prevreg->getWidth() / component.getAddressUnitBits(); // in bytes.
+                    expStart  = prevreg->getAddr() + (width * prevreg->getDimensions());
+                    padding   = reg->getAddr() - expStart;
+                }
+                else
+                {
+                    expStart = 0;
+                    padding  = reg->getAddr();
+                }
+
+                if(padding)
+                {
+                    if(padding > 0)
+                    {
+                        if(0 == padding % 4)
+                        {
+                            padding /= 4;
+                        }
+                        else if(0 == padding % 2)
+                        {
+                            padding /= 2;
+                        }
+
+                        decl << indent() << "for(int i = 0; i < " << std::dec << padding << "; i++)" << endl;
+                        decl << indent() << "{" << endl;
+                        indent(1);
+                        decl << indent() << "reserved_" << std::dec << expStart << "[i].print();" << endl;
+                        decl << indent(-1) << "}" << endl;
+
+                    }
+                }
+                prevreg = reg;
+
+
                 string regname = reg->getName();
                 std::transform(regname.begin(),       regname.end(),       regname.begin(),       ::toupper);
 
