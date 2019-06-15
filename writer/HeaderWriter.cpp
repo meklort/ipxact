@@ -948,6 +948,11 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
                     decl << indent() << "for(int i = 0; i < " << std::dec << dim << "; i++)" << endl;
                     decl << indent() << "{" << endl;
                     indent(1);
+                    if(!reg->getTypeID().empty())
+                    {
+                        // Override the .r32 name to match the variable.
+                        decl << indent() << basename << ".setName(\"" << newname << "\");" << endl;
+                    }
                     decl << indent() << basename << ".setComponentOffset(0x" << std::hex << reg->getAddr() << " + (i * " << to_string(width/8) << "));" << endl;
                     decl << indent(-1) << "}" << endl;
 
@@ -955,7 +960,52 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
                 else
                 {
                     string basename = newname + string(".r") + to_string(width);
+                    if(!reg->getTypeID().empty())
+                    {
+                        // Override the .r32 name to match the variable.
+                        decl << indent() << basename << ".setName(\"" << newname << "\");" << endl;
+                    }
                     decl << indent() << basename << ".setComponentOffset(0x" << std::hex << reg->getAddr() << ");" << endl;
+                }
+            }
+        }
+        decl << indent(-1) << "}" << endl;
+
+        decl << indent() << "void print()" << endl;
+        decl << indent() << "{" << endl;
+        indent(1);
+        for(it = regs.begin(); it != regs.end(); it++)
+        {
+            Register* reg = *it;
+
+            if(reg)
+            {
+                string regname = reg->getName();
+                std::transform(regname.begin(),       regname.end(),       regname.begin(),       ::toupper);
+
+                string newname = regname;
+                newname = camelcase(escape(newname));
+                if(isdigit(regname[0]))
+                {
+                    newname = string("_") + newname;
+                    cout << "Invalid: " << newname << endl;
+                    // exit(-1);
+                }
+
+                int dim = reg->getDimensions();
+                if(dim > 1)
+                {
+                    string basename = newname + string("[i]");
+                    decl << indent() << "for(int i = 0; i < " << std::dec << dim << "; i++)" << endl;
+                    decl << indent() << "{" << endl;
+                    indent(1);
+                    decl << indent() << basename << ".print();" << endl;
+                    decl << indent(-1) << "}" << endl;
+
+                }
+                else
+                {
+                    decl << indent() << newname << ".print();" << endl;
                 }
             }
         }
