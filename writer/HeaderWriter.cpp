@@ -364,6 +364,29 @@ string HeaderWriter::serialize_bitmap_constructor(Component& component, Register
     decl << indent() << bitvar << ".setBaseRegister(&" + basename + ");" << endl;
     decl << indent() << bitvar << ".setName(\"" + bitmapname + "\");" << endl;
 
+    if(!bitmap.get().empty())
+    {
+        const std::list<Enumeration*>& bits = bitmap.get();
+        std::list<Enumeration*>::const_iterator bits_it;
+        for(bits_it = bits.begin(); bits_it != bits.end(); bits_it++)
+        {
+            Enumeration* thisenum = *bits_it;
+            if(thisenum)
+            {
+                thisenum->sort();
+
+                string enumname = (*thisenum).getName();
+                int value = (*thisenum).getValue();
+
+                decl << indent() << bitvar << ".addEnum(\"" << enumname << "\", " << value << ");" << endl;
+
+                // decl << serialize_enum_definition(component, reg, bitmap, *thisenum);
+            }
+        }
+
+         decl << endl;
+    }
+
     return decl.str();
 }
 
