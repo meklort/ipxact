@@ -211,14 +211,75 @@ string SimulatorWriter::serialize_register_definition(Component& component, Regi
     return decl.str();;
 }
 
-string SimulatorWriter::serialize_register_mmap_definition(Component& component, Register& reg)
+string SimulatorWriter::serialize_register_mmap_definition(Component& component, Register& reg, Register* prevreg)
 {
     string regname = reg.getName();
     string componentType = get_type_name(component);
 
-    std::transform(regname.begin(),       regname.end(),       regname.begin(),       ::toupper);
+    std::transform(regname.begin(), regname.end(), regname.begin(), ::toupper);
 
     ostringstream decl;
+
+
+    int padding = 0;
+    int expStart = 0;
+    if(prevreg)
+    {
+        int width = prevreg->getWidth() / component.getAddressUnitBits(); // in bytes.
+        expStart  = prevreg->getAddr() + (width * prevreg->getDimensions());
+        padding   = reg.getAddr() - expStart;
+    }
+    else
+    {
+        expStart = 0;
+        padding  = reg.getAddr();
+    }
+
+    if(padding)
+    {
+        if(padding > 0)
+        {
+            if(prevreg)
+            {
+                fprintf(stdout, "Info: adding %d bytes of padding between register %s and %s.\n", padding, prevreg->getName().c_str(), reg.getName().c_str());
+            }
+            else
+            {
+                fprintf(stdout, "Info: adding %d bytes of padding before first register %s.\n", padding, reg.getName().c_str());
+            }
+            if(0 == padding % 4)
+            {
+                padding /= 4;
+            }
+            else if(0 == padding % 2)
+            {
+                padding /= 2;
+            }
+
+            string basename = string(component.getName()) + string(".") + "reserved_";
+            decl << indent() << "for(int i = 0; i < " << std::dec << padding << "; i++)" << endl;
+            decl << indent() << "{" << endl;
+            indent(1);
+            decl << indent() << basename << std::dec << expStart << "[i].installReadCallback(read_from_ram, (uint8_t *)base);" << endl;
+            decl << indent() << basename << std::dec << expStart << "[i].installWriteCallback(write_to_ram, (uint8_t *)base);" << endl;
+            decl << indent(-1) << "}" << endl;
+        }
+        else
+        {
+            if(prevreg)
+            {
+                fprintf(stderr, "Error: requested %d bytes of padding between component type '%s' registers '%s' and '%s'.\n",
+                    padding, componentType.c_str(), prevreg->getName().c_str(), reg.getName().c_str());
+            }
+            else
+            {
+                fprintf(stderr, "Error: requested %d bytes of padding before component type %s's first register '%s'.\n",
+                    padding, componentType.c_str(), reg.getName().c_str());
+            }
+            while(1);
+        }
+    }
+
 
     decl << indent() << "/** @brief Bitmap for @ref " << componentType << "." << camelcase(regname) << ". */" << endl;
 
@@ -371,13 +432,15 @@ std::string    SimulatorWriter::serialize_mmap_declaration(Component& component)
     std::list<Register*>::const_iterator it;
 
     decl << indent() << "/** @brief Component Registers for @ref " << componentname << ". */" << endl;
+    Register* prevreg = NULL;
     for(it = regs.begin(); it != regs.end(); it++)
     {
         Register* reg = *it;
         if(reg)
         {
             reg->sort();
-            decl << serialize_register_mmap_definition(component, *reg);
+            decl << serialize_register_mmap_definition(component, *reg, prevreg);
+            prevreg = reg;
         }
     }
 

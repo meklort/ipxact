@@ -49,7 +49,7 @@
 #ifndef <GUARD>
 #define <GUARD>
 
-#include <stdint.h>
+#include <types.h>
 <INCLUDES>
 #ifdef CXX_SIMULATOR /* Compiling c++ simulator code - uses register wrappers */
 void init_<INIT_FUNCTION>_sim(void* base);

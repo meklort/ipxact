@@ -65,7 +65,7 @@ protected:
     virtual std::string serialize_bitmap_declaration(Component& component, Register& reg, RegisterBitmap& bitmap, int regwidth);
 
     virtual std::string serialize_register_definition(Component& component, Register& reg);
-    virtual std::string serialize_register_mmap_definition(Component& component, Register& reg);
+    virtual std::string serialize_register_mmap_definition(Component& component, Register& reg, Register* prevreg);
 
     virtual std::string serialize_component_declaration(Component& component);
     virtual std::string serialize_mmap_declaration(Component& component);

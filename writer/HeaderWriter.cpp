@@ -378,7 +378,7 @@ string HeaderWriter::serialize_bitmap_constructor(Component& component, Register
                 string enumname = (*thisenum).getName();
                 int value = (*thisenum).getValue();
 
-                decl << indent() << bitvar << ".addEnum(\"" << enumname << "\", " << value << ");" << endl;
+                decl << indent() << bitvar << ".addEnum(\"" << enumname << "\", 0x" << std::hex << value << ");" << endl;
 
                 // decl << serialize_enum_definition(component, reg, bitmap, *thisenum);
             }
@@ -945,12 +945,53 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
         decl << indent() << componentType << "()" << endl;
         decl << indent() << "{" << endl;
         indent(1);
+        prevreg = NULL;
         for(it = regs.begin(); it != regs.end(); it++)
         {
             Register* reg = *it;
 
             if(reg)
             {
+                int width = reg->getWidth();
+                int dim = reg->getDimensions();
+                // Ensure we don't have any gaps.
+                int padding = 0;
+                int expStart = 0;
+                if(prevreg)
+                {
+                    int width = prevreg->getWidth() / component.getAddressUnitBits(); // in bytes.
+                    expStart  = prevreg->getAddr() + (width * prevreg->getDimensions());
+                    padding   = reg->getAddr() - expStart;
+                }
+                else
+                {
+                    expStart = 0;
+                    padding  = reg->getAddr();
+                }
+
+                if(padding)
+                {
+                    if(padding > 0)
+                    {
+                        if(0 == padding % 4)
+                        {
+                            padding /= 4;
+                        }
+                        else if(0 == padding % 2)
+                        {
+                            padding /= 2;
+                        }
+
+                        decl << indent() << "for(int i = 0; i < " << std::dec << padding << "; i++)" << endl;
+                        decl << indent() << "{" << endl;
+                        indent(1);
+                        decl << indent() << "reserved_" << std::dec << expStart << "[i].setComponentOffset(0x" << std::hex << expStart << " + (i * " << to_string(width/8) << "));" << endl;
+                        decl << indent(-1) << "}" << endl;
+
+                    }
+                }
+                prevreg = reg;
+
                 string regname = reg->getName();
                 std::transform(regname.begin(),       regname.end(),       regname.begin(),       ::toupper);
 
@@ -963,8 +1004,6 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
                     // exit(-1);
                 }
 
-                int width = reg->getWidth();
-                int dim = reg->getDimensions();
                 if(dim > 1)
                 {
                     string basename = newname + string("[i].r") + to_string(width);
