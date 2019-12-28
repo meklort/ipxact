@@ -55,12 +55,12 @@ using namespace std;
 
 Reader* ReaderFactory::open(const char* filename, Components& components)
 {
-	Reader* myreader = NULL;
+	Reader* myReader = NULL;
 	char* file = strdup(filename);
 	char* saveptr;
 	char* partial = strtok_r(file, ".", &saveptr);
 
-	// find file extension and return apropriate output writer.
+	// find file extension and return appropriate output writer.
 	do
 	{
 		char* next = strtok_r(NULL, ".", &saveptr);
@@ -68,15 +68,15 @@ Reader* ReaderFactory::open(const char* filename, Components& components)
 		{
 			printf("Checking extension '%s'\n", partial);
 
-			     if(0 == strncmp("xml", partial, sizeof("xml"))) 		myreader = new IPXACTReader(filename, components);
-			else if(0 == strncmp("xhtml", partial, sizeof("xhtml"))) 	myreader = new XHTMLReader(filename, components);
+			     if(0 == strncmp("xml", partial, sizeof("xml"))) 		myReader = new IPXACTReader(filename, components);
+			else if(0 == strncmp("xhtml", partial, sizeof("xhtml"))) 	myReader = new XHTMLReader(filename, components);
 		}
 		partial = next;
 	} while(partial);
 
 	free(file);
-	printf("Reader: %p(%s)\n", myreader, filename);
-	return myreader;
+	printf("Reader: %p(%s)\n", myReader, filename);
+	return myReader;
 }
 
 

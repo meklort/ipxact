@@ -253,7 +253,7 @@ bool XHTMLReader::addRegister(const pugi::xml_node& elem, Component &component, 
 
         if(ismii && string(desc) == "Miscellaneous Control")
         {
-            // REgister address has a typo in the xhml file.
+            // Register address has a typo in the xhtml file.
             register_address |= 0xFFFFF000;
         }
 

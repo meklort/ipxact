@@ -64,12 +64,12 @@ using namespace std;
 
 Writer* WriterFactory::create(const char* filename, const char* force_extension)
 {
-    Writer* mywriter = NULL;
+    Writer* myWriter = NULL;
     char* file = strdup(filename);
     char* saveptr;
     char* partial = strtok_r(file, ".", &saveptr);
 
-    // find file extension and return apropriate output writer.
+    // find file extension and return appropriate output writer.
     do
     {
         char* next;
@@ -90,44 +90,44 @@ Writer* WriterFactory::create(const char* filename, const char* force_extension)
             if(0 == strncmp("h", partial, sizeof("h")))
             {
                 // header.
-                mywriter = new HeaderWriter(filename);
+                myWriter = new HeaderWriter(filename);
             }
             else if(0 == strncmp("xml", partial, sizeof("xml")))
             {
                 // ipxact.
-                mywriter = new IPXACTWriter(filename);
+                myWriter = new IPXACTWriter(filename);
             }
             else if(0 == strncmp("tex", partial, sizeof("tex")))
             {
                 // ipxact.
-                mywriter = new LaTeXWriter(filename);
+                myWriter = new LaTeXWriter(filename);
             }
             else if(0 == strncmp("asym", partial, sizeof("asym")))
             {
                 // ipxact.
-                mywriter = new ASMSymbols(filename);
+                myWriter = new ASMSymbols(filename);
             }
             else if(0 == strncmp("s", partial, sizeof("s")))
             {
                 // ipxact.
-                mywriter = new ASMWriter(filename);
+                myWriter = new ASMWriter(filename);
             }
             else if(0 == strncmp("cpp", partial, sizeof("cpp")))
             {
                 // Simulation / model.
-                mywriter = new SimulatorWriter(filename);
+                myWriter = new SimulatorWriter(filename);
             }
             else if(0 == strncmp("ape_cpp", partial, sizeof("ape_cpp")))
             {
                 // Simulation / Model.
-                mywriter = new APESimulatorWriter(filename);
+                myWriter = new APESimulatorWriter(filename);
             }
         }
         partial = next;
     } while(partial);
 
     free(file);
-    return mywriter;
+    return myWriter;
 }
 
 

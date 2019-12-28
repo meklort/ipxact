@@ -55,7 +55,7 @@ using namespace std;
 
 // <FILE>           filename.h
 // <PROJECT>        project
-// <DESCRIPTION>    fileanem registers
+// <DESCRIPTION>    filename registers
 // <GUARD>          PATH_TO_FILENAME_H
 
 HeaderWriter::HeaderWriter(const char* filename) : Writer(filename)
@@ -102,7 +102,7 @@ std::string HeaderWriter::get_type_name(Component& component, Register& reg)
     return reg_type;
 }
 
-std::string HeaderWriter::type(int width, bool issigned) const
+std::string HeaderWriter::type(int width, bool isSigned) const
 {
 
     string guard(mFilename);
@@ -112,7 +112,7 @@ std::string HeaderWriter::type(int width, bool issigned) const
 
     string regtype = guard + "_";
 
-    switch(issigned)
+    switch(isSigned)
     {
         case true: regtype += ""; break;
         case false: regtype += "u"; break;
@@ -334,7 +334,7 @@ static int getNextExpectedWidth(RegisterBitmap& bit, std::list<RegisterBitmap*>:
             if(0 == (base_bit % 8))
             {
                 //cout << "next: ";
-                // this bit is perfectly valud, check for it's next.
+                // this bit is perfectly valid, check for it's next.
                 return  getExpectedWidth(*next_bit, bits_next, bits);
             }
         }
@@ -649,7 +649,7 @@ string HeaderWriter::serialize_register_definition(Component& component, Registe
                 if("none" != padding.getName())
                 {
                     RegisterBitmap padding_nop("nop");
-                    // paddinf needed.
+                    // padding needed.
                     int prev_position_nop = prev_position;
                     string padding_str = convert_single_bitmap(*this, component, reg, &padding, prev_position_nop, padding_nop);
                     decl << padding_str;

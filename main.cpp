@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     parser.set_defaults("project", "<PROJECT>");
 
     parser.add_option("-a", "--merge-addr").action("store_true").dest("merge-addr").help("Merge register by addresses for duplicate components");
-    parser.add_option("-n", "--merge-name").action("store_false").dest("merge-name").help("Merge register by names for duplicate components");
+    parser.add_option("-n", "--merge-name").action("store_false").dest("merge-addr").help("Merge register by names for duplicate components");
     parser.add_option("-p", "--project").dest("project").help("Sets the project name to replace <PROJECT> with");
     parser.add_option("-t", "--type").dest("type") .help("Overrides the output file type");
 
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     }
 
     // Attempt to open output file writer.
-    fprintf(stdout, "OPening output file: %s\n", outname);
+    fprintf(stdout, "Opening output file: %s\n", outname);
     Writer* myWriter = WriterFactory::create(outname, force_ext);
 
     if(!myWriter)
@@ -127,12 +127,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        if(myWriter->is_open())
-        {
-            // output file properly opened for writing.
-
-        }
-        else
+        if(!myWriter->is_open())
         {
             fprintf(stderr, "Unable to open output file '%s' for writing\n", outname);
             delete myWriter;

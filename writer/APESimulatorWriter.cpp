@@ -55,7 +55,7 @@ using namespace std;
 
 // <FILE>           filename.h
 // <PROJECT>        project
-// <DESCRIPTION>    fileanem registers
+// <DESCRIPTION>    filename registers
 // <GUARD>          PATH_TO_FILENAME_H
 
 APESimulatorWriter::APESimulatorWriter(const char* filename) : Writer(filename)
@@ -88,11 +88,11 @@ std::string APESimulatorWriter::getComponentAPEFile(const char* componentname)
 }
 
 
-std::string APESimulatorWriter::type(int width, bool issigned) const
+std::string APESimulatorWriter::type(int width, bool isSigned) const
 {
     string regtype;
 
-    switch(issigned)
+    switch(isSigned)
     {
         case true: regtype = ""; break;
         case false: regtype = "u"; break;

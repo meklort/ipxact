@@ -55,7 +55,7 @@ using namespace std;
 
 // <FILE>           filename.h
 // <PROJECT>        project
-// <DESCRIPTION>    fileanem registers
+// <DESCRIPTION>    filename registers
 // <GUARD>          PATH_TO_FILENAME_H
 
 SimulatorWriter::SimulatorWriter(const char* filename) : Writer(filename)
@@ -112,11 +112,11 @@ std::string SimulatorWriter::get_type_name(Component& component, Register& reg)
 }
 
 
-std::string SimulatorWriter::type(int width, bool issigned) const
+std::string SimulatorWriter::type(int width, bool isSigned) const
 {
     string regtype;
 
-    switch(issigned)
+    switch(isSigned)
     {
         case true: regtype = ""; break;
         case false: regtype = "u"; break;

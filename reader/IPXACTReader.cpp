@@ -137,12 +137,12 @@ bool IPXACTReader::parseComponent(const pugi::xml_node& elem)
     string componentname;
 
     // Determine addressable unit for this block, if set.
-    const xml_node adressable = elem.next_sibling("ipxact:addressUnitBits");
-    if(adressable)
+    const xml_node addressable = elem.next_sibling("ipxact:addressUnitBits");
+    if(addressable)
     {
-        if(adressable.child_value())
+        if(addressable.child_value())
         {
-            Number bits(adressable.child_value());
+            Number bits(addressable.child_value());
 
             if(bits.isValid())
             {
@@ -150,7 +150,7 @@ bool IPXACTReader::parseComponent(const pugi::xml_node& elem)
             }
             else
             {
-                cerr << "Error: ipxact:addressUnitBits with invalid text: " << adressable.child_value() << endl;
+                cerr << "Error: ipxact:addressUnitBits with invalid text: " << addressable.child_value() << endl;
                 status = false;
             }
         }
@@ -173,7 +173,7 @@ bool IPXACTReader::parseComponent(const pugi::xml_node& elem)
     }
     else
     {
-        // component already exists, don't add new elemetns, just update them.
+        // component already exists, don't add new elements, just update them.
         update = true;
     }
 

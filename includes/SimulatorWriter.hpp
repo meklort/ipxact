@@ -4,7 +4,7 @@
 ///
 /// @project    ipxact
 ///
-/// @brief      C++ based simulatoion support.
+/// @brief      C++ based simulation support.
 ///
 ////////////////////////////////////////////////////////////////////////////////
 ///
@@ -78,7 +78,7 @@ protected:
 
     virtual std::string get_type_name(Component& component, Register& reg);
 
-    virtual std::string type(int width, bool issigned) const;
+    virtual std::string type(int width, bool isSigned) const;
 
     virtual std::string& escape(std::string &str);
     virtual std::string& escapeEnum(std::string &str);

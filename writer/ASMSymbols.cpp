@@ -64,11 +64,11 @@ ASMWriter::~ASMWriter()
     if(mFilename) free(mFilename);
 }
 
-std::string ASMWriter::type(int width, bool issigned) const
+std::string ASMWriter::type(int width, bool isSigned) const
 {
     string regtype;
 
-    switch(issigned)
+    switch(isSigned)
     {
         case true: regtype = "S"; break;
         case false: regtype = "U"; break;
