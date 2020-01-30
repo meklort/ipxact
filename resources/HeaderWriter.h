@@ -89,6 +89,10 @@ typedef uint32_t <GUARD>_uint32_t;
 #undef BITFIELD_MEMBER
 #undef BITFIELD_END
 
+#ifndef CXX_SIMULATOR
+_Static_assert(sizeof(<COMPONENT_TYPE>_t) == <COMPONENT_SIZE>, "sizeof(<COMPONENT_TYPE>_t) must be <COMPONENT_SIZE>");
+#endif
+
 #endif /* !<GUARD> */
 
 /** @} */

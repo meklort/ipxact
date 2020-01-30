@@ -553,11 +553,11 @@ static string convert_single_bitmap(HeaderWriter& writer, Component& component, 
                     currentStop = newStart + 1; //
 
                 }
-                    if(loops > 1)
-                    {
-                        cout << "reduced." << endl;
-                        // /exit(-1);
-                    }
+                if(loops > 1)
+                {
+                    cout << "reduced." << endl;
+                    // /exit(-1);
+                }
             }
             decl << writer.serialize_bitmap_declaration(component, reg, *bit, width);
         }
@@ -665,9 +665,9 @@ string HeaderWriter::serialize_register_definition(Component& component, Registe
                 RegisterBitmap padding_nop("nop");
                 ostringstream name;
                 // Pad out to the needed position
-                name << "reserved" << "_" << std::dec << 31 << "_" << stop;
+                name << "reserved" << "_" << std::dec << (width - 1) << "_" << stop;
                 padding.setName(name.str());
-                padding.setStart(31);
+                padding.setStart(width - 1);
                 padding.setStop(stop);
                 padding.setDescription("Padding");
 
@@ -827,7 +827,7 @@ string HeaderWriter::serialize_register_declaration(Component& component, Regist
     return decl.str();
 }
 
-std::string    HeaderWriter::serialize_component_declaration(Component& component)
+std::string HeaderWriter::serialize_component_declaration(Component& component)
 {
     const string& componentname = component.getName();
     string componentType = get_type_name(component);
@@ -898,17 +898,20 @@ std::string    HeaderWriter::serialize_component_declaration(Component& componen
                         {
                             fprintf(stdout, "Info: adding %d bytes of padding before first register %s.\n", padding, reg->getName().c_str());
                         }
-                        int padwidth = 8;
-                        if(0 == padding % 4)
-                        {
-                            padding /= 4;
-                            padwidth = 32;
-
-                        }
-                        else if(0 == padding % 2)
+                        int padwidth = component.getAddressUnitBits();
+                        // 8 -> 16
+                        if(padwidth <= 16 && 0 == padding % 2)
                         {
                             padding /= 2;
-                            padwidth = 16;
+                            padwidth *= 2;
+
+                        }
+                        // 16 -> 32
+                        if(padwidth <= 16 && 0 == padding % 2)
+                        {
+                            padding /= 2;
+                            padwidth *= 2;
+
                         }
 
                         cout << indent() << "/** @brief " << "Reserved bytes to pad out data structure." << " */" << endl;

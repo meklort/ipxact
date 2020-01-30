@@ -157,13 +157,38 @@ static void strreplace(string& origstr, const string& find, const string& replac
 void Writer::UpdateTemplate(std::string& contents, std::string& filename, Component &component)
 {
     const string& componentname = component.getName();
+    int componentSize = 0;
 
     string componentTypeID = component.getTypeID();
     string type = componentTypeID.empty() ? component.getName() : componentTypeID;
     std::transform(type.begin(), type.end(), type.begin(), ::toupper);
 
+    if(component.getRange())
+    {
+        componentSize = component.getRange();
+    }
+    else
+    {
+        if(!component.get().empty())
+        {
+            Register* lastreg = component.get().back();
+            if(lastreg)
+            {
+                int endwidth = lastreg->getWidth();
+                int endaddr = lastreg->getAddr();
+                int dims = lastreg->getDimensions();
+                int addessablesize = component.getAddressUnitBits();
+
+                componentSize = (dims * (endwidth/8)) + endaddr;
+                componentSize *= addessablesize/8;
+            }
+        }
+    }
+
+
     strreplace(contents, "<COMPONENT>", componentname.c_str());
     strreplace(contents, "<COMPONENT_TYPE>", type.c_str());
+    strreplace(contents, "<COMPONENT_SIZE>", std::to_string(componentSize));
 
     UpdateTemplate(contents, filename);
 }
