@@ -44,33 +44,3 @@
 
 add_subdirectory(pugixml)
 add_subdirectory(OptParse)
-
-include(ExternalProject)
-
-ExternalProject_Add(
-    pcre2-ext
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/pcre2/pcre2-10.20.tar.bz2
-    URL_HASH MD5=dcd027c57ecfdc8a6c3af9d0acf5e3f7
-    PREFIX ${CMAKE_BINARY_DIR}/libs/pcre2
-    CONFIGURE_COMMAND ${CMAKE_COMMAND}
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DPCRE2_BUILD_PCRE2GREP=OFF
-        -DPCRE2_BUILD_TESTS=OFF <SOURCE_DIR>
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_SOURCE_DIR}/pcre2/pcre2_policy.patch
-        <SOURCE_DIR>/CMakeLists.txt
-    BUILD_BYPRODUCTS
-        <INSTALL_DIR>/lib/libpcre2-8.a
-)
-
-add_library(pcre2 STATIC IMPORTED GLOBAL)
-
-add_dependencies(pcre2 pcre2-ext)
-
-ExternalProject_Get_Property(pcre2-ext INSTALL_DIR)
-set_target_properties(pcre2      PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/lib/libpcre2-8.a")
-execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${INSTALL_DIR}/include/")
-target_include_directories(pcre2 INTERFACE "${INSTALL_DIR}/include/")
-MESSAGE("pcre2 IMPORTED_LOCATIONL: ${INSTALL_DIR}/lib/libpcre2-8.a")
-MESSAGE("pcre2 INTERFACE: ${INSTALL_DIR}/include/")
-

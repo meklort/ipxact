@@ -1,6 +1,6 @@
 ################################################################################
 ###
-### @file       CMakeLists.txt 
+### @file       CMakeLists.txt
 ###
 ### @project    ipxact
 ###
@@ -45,6 +45,9 @@ cmake_minimum_required (VERSION 2.6)
 
 project (ipxact)
 
+SET(CXX_STANDARD_REQUIRED True)
+SET(CXX_STANDARD 11)
+
 set( CMAKE_CXX_FLAGS "-Wall -Werror -O3" )
 
 add_subdirectory(libs)
@@ -53,7 +56,7 @@ add_subdirectory(resources)
 include_directories(includes)
 include_directories(${CMAKE_BINARY_DIR}/resources/includes)
 
-ADD_RESOURCES(RESOURCES 
+ADD_RESOURCES(RESOURCES
     resources/SimulatorOutput.cpp
     resources/SimulatorOutput_mmap.cpp
     resources/SimulatorOutput_ape.cpp
@@ -64,8 +67,6 @@ ADD_RESOURCES(RESOURCES
 
 set(${PROJECT_NAME}_SRCS
     main.cpp
-
-    regular_expressions.cpp
 
     Number.cpp
     Register.cpp
@@ -87,6 +88,6 @@ set(${PROJECT_NAME}_SRCS
 )
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_SRCS})
-target_link_libraries(${PROJECT_NAME} pcre2 pugixml OptParse)
+target_link_libraries(${PROJECT_NAME} pugixml OptParse)
 
 install (TARGETS ${PROJECT_NAME} DESTINATION bin)
