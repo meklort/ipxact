@@ -10,7 +10,7 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////
 ///
-/// @copyright Copyright (c) 2019, Evan Lojewski
+/// @copyright Copyright (c) 2019-2020, Evan Lojewski
 /// @cond
 ///
 /// All rights reserved.
@@ -43,12 +43,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <Number.hpp>
 
-#include <regular_expressions.hpp>
-
 #include <stdio.h>
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <regex>
 using namespace std;
 
 const char VERILOG_PARSER_REGEX[]  = "\\s*([0-9]+)'([hbdo])([0-9A-Fa-f_]+)\\s*";
@@ -60,13 +59,14 @@ Number::Number(const string& numstring)
     mWidth = 0;
     mValue = 0;
 
-    RegExp regex(VERILOG_PARSER_REGEX);
-    RegExp numregex(NUMBER_PARSER_REGEX);
-    if(regex.ExactMatch(numstring))
+    static regex verregex(VERILOG_PARSER_REGEX);
+    static regex numregex(NUMBER_PARSER_REGEX);
+    smatch match;
+    if(regex_search(numstring, match, verregex) && match.size() > 1)
     {
-        const string& bits   = regex.CaptureText(1);
-        const string& type   = regex.CaptureText(2);
-        const string& valstr = regex.CaptureText(3);
+        const string& bits   = match.str(1);
+        const string& type   = match.str(2);
+        const string& valstr = match.str(3);
 
         // remove all '_'
         string no_under(valstr);
@@ -110,11 +110,11 @@ Number::Number(const string& numstring)
             mValid = false;
         }
     }
-    else if(numregex.ExactMatch(numstring))
+    else if(regex_search(numstring, match, numregex) && match.size() > 1)
     {
         mValid = true;
-        const string& type   = numregex.CaptureText(1);
-        const string& valstr = numregex.CaptureText(2);
+        const string& type   = match.str(1);
+        const string& valstr = match.str(2);
 
         if(type == "")
         {

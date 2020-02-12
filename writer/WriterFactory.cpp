@@ -46,6 +46,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sstream>
+#include <ctime>
 
 #include <main.hpp>
 
@@ -202,6 +203,18 @@ void Writer::UpdateTemplate(std::string& contents, std::string& filename)
 
     strreplace(contents, "<FILE>", filename);
     strreplace(contents, "<PROJECT>", (*gOptions)["project"].c_str());
+
+    static struct tm *timeinfo;
+    static char tbuf[5];
+    if (!timeinfo)
+    {
+        time_t rawtime;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(tbuf, sizeof(tbuf), "%Y", timeinfo);
+    }
+    strreplace(contents, "<YEAR>", tbuf);
 
     string filename_strip = filename;
 
