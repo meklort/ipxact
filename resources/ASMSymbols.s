@@ -10,7 +10,7 @@
 ###
 ################################################################################
 ###
-### @copyright Copyright (c) 2018, Evan Lojewski
+### @copyright Copyright (c) <YEAR>, Evan Lojewski
 ### @cond
 ###
 ### All rights reserved.
