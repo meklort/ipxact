@@ -945,7 +945,15 @@ std::string HeaderWriter::serialize_component_declaration(Component& component)
         }
 
         decl << "#ifdef CXX_SIMULATOR" << endl;
-        decl << indent() << componentType << "()" << endl;
+
+        decl << indent() << "typedef uint32_t (*callback_t)(uint32_t, uint32_t, void*);" << endl;
+        decl << indent() << "callback_t mIndexReadCallback;" << endl;
+        decl << indent() << "void* mIndexReadCallbackArgs;" << endl << endl;
+
+        decl << indent() << "callback_t mIndexWriteCallback;" << endl;
+        decl << indent() << "void* mIndexWriteCallbackArgs;" << endl << endl;
+
+        decl << indent() << componentType << "() : mIndexReadCallback(0), mIndexReadCallbackArgs(0), mIndexWriteCallback(0), mIndexWriteCallbackArgs(0)" << endl;
         decl << indent() << "{" << endl;
         indent(1);
         prevreg = NULL;
@@ -1115,13 +1123,6 @@ std::string HeaderWriter::serialize_component_declaration(Component& component)
             }
         }
         decl << indent(-1) << "}" << endl;
-
-        decl << indent() << "typedef uint32_t (*callback_t)(uint32_t, uint32_t, void*);" << endl;
-        decl << indent() << "callback_t mIndexReadCallback;" << endl;
-        decl << indent() << "void* mIndexReadCallbackArgs;" << endl << endl;
-
-        decl << indent() << "callback_t mIndexWriteCallback;" << endl;
-        decl << indent() << "void* mIndexWriteCallbackArgs;" << endl << endl;
 
         decl << indent() << "uint32_t read(int offset) { return mIndexReadCallback(0, offset, mIndexReadCallbackArgs); }" << endl;
         decl << indent() << "void write(int offset, uint32_t value) { (void)mIndexWriteCallback(value, offset, mIndexWriteCallbackArgs); }" << endl;
