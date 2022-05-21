@@ -83,6 +83,7 @@ protected:
     virtual std::string indent(int modifier = 0);
 
     virtual std::string type(int width, bool isSigned) const;
+    virtual std::string get_volatile() const;
 
     virtual std::string& escape(std::string &str);
     virtual std::string& escapeEnum(std::string &str);

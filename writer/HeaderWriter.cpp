@@ -132,6 +132,16 @@ std::string HeaderWriter::type(int width, bool isSigned) const
     return regtype;
 }
 
+std::string HeaderWriter::get_volatile() const
+{
+    string volatile_str(mFilename);
+    std::transform(volatile_str.begin(), volatile_str.end(), volatile_str.begin(), ::toupper);
+    std::replace(volatile_str.begin(), volatile_str.end(), '.', '_');
+    std::replace(volatile_str.begin(), volatile_str.end(), '/', '_');
+
+    return volatile_str + "_VOLATILE";
+}
+
 std::string HeaderWriter::indent(int modifier)
 {
     ostringstream indent;
@@ -581,7 +591,7 @@ string HeaderWriter::serialize_register_definition(Component& component, Registe
 
     ostringstream decl;
     string defregname = regname;
-    decl <<  "#define REG_" << componentname << "_" << escape(defregname) << " ((volatile " <<  type(reg.getWidth(), false) << "*)0x" << std::hex << (component.getBase() + reg.getAddr()) << ") /* " << reg.getDescription() << " */" << endl;
+    decl <<  "#define REG_" << componentname << "_" << escape(defregname) << " ((" << get_volatile() << " " << type(reg.getWidth(), false) << "*)0x" << std::hex << (component.getBase() + reg.getAddr()) << ") /* " << reg.getDescription() << " */" << endl;
 
     if(!(component.isTypeIDCopy() || reg.isTypeIDCopy()))
     {
@@ -1132,7 +1142,7 @@ std::string HeaderWriter::serialize_component_declaration(Component& component)
     }
 
     decl << indent() << "/** @brief " << component.getDescription() << " */" << endl;
-    decl << indent() << "extern volatile " << componentType << " " << componentname << ";"<< endl << endl;
+    decl << indent() << "extern " << get_volatile() << " " << componentType << " " << componentname << ";"<< endl << endl;
 
     return decl.str();
 }

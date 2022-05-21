@@ -63,7 +63,7 @@ typedef CXXRegister<uint32_t, 0, 32> <GUARD>_uint32_t;
 #define <GUARD>_uint16_t_bitfield(__pos__, __width__) CXXRegister<uint16_t, __pos__, __width__>
 #define <GUARD>_uint32_t_bitfield(__pos__, __width__) CXXRegister<uint32_t, __pos__, __width__>
 #define register_container struct
-#define volatile
+#define <VOLATILE>
 #define BITFIELD_BEGIN(__type__, __name__) struct {
 #define BITFIELD_MEMBER(__type__, __name__, __offset__, __bits__) __type__##_bitfield(__offset__, __bits__) __name__;
 #define BITFIELD_END(__type__, __name__) } __name__;
@@ -73,16 +73,13 @@ typedef uint8_t  <GUARD>_uint8_t;
 typedef uint16_t <GUARD>_uint16_t;
 typedef uint32_t <GUARD>_uint32_t;
 #define register_container union
+#define <VOLATILE> volatile
 #define BITFIELD_BEGIN(__type__, __name__) struct {
 #define BITFIELD_MEMBER(__type__, __name__, __offset__, __bits__) __type__ __name__:__bits__;
 #define BITFIELD_END(__type__, __name__) } __name__;
 #endif /* !CXX_SIMULATOR */
 
 <SERIALIZED>
-
-#ifdef CXX_SIMULATOR /* Compiling c++ code - uses register wrappers */
-#undef volatile
-#endif /* CXX_SIMULATOR */
 
 #undef register_container
 #undef BITFIELD_BEGIN

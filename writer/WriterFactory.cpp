@@ -224,6 +224,7 @@ void Writer::UpdateTemplate(std::string& contents, std::string& filename)
 
     strreplace(contents, "<INIT_FUNCTION>", filename_strip);
     strreplace(contents, "<GUARD>", guard);
+    strreplace(contents, "<VOLATILE>", guard + "_VOLATILE");
 
     ostringstream descstream;
     descstream << filename_strip;
