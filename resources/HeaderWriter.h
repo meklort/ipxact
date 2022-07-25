@@ -52,7 +52,7 @@
 #include <types.h>
 <INCLUDES>
 #ifdef CXX_SIMULATOR /* Compiling c++ simulator code - uses register wrappers */
-void init_<INIT_FUNCTION>_sim(void* base);
+void init_<INIT_FUNCTION>_sim(void* base, uint32_t (*read)(uint32_t val, uint32_t offset, void *args), uint32_t (*write)(uint32_t val, uint32_t offset, void *args));
 void init_<INIT_FUNCTION>(void);
 
 #include <CXXRegister.h>

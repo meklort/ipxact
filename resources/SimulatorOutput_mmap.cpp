@@ -46,38 +46,14 @@
 #include <utility>
 <INCLUDES>
 
-#ifdef __ppc64__
-#define BARRIER()    do { asm volatile ("sync 0\neieio\n" ::: "memory"); } while(0)
-#else
-#define BARRIER()    do { asm volatile ("" ::: "memory"); } while(0)
-#endif
-
-static uint32_t read_from_ram(uint32_t val, uint32_t offset, void *args)
+void init_<INIT_FUNCTION>(void *base,
+    uint32_t (*read)(uint32_t val, uint32_t offset, void *args),
+    uint32_t (*write)(uint32_t val, uint32_t offset, void *args))
 {
-    uint8_t *base = (uint8_t *)args;
-    base += offset;
-
-    BARRIER();
-    return *(uint32_t *)base;
-}
-
-static uint32_t write_to_ram(uint32_t val, uint32_t offset, void *args)
-{
-    uint8_t *base = (uint8_t *)args;
-    base += offset;
-
-    BARRIER();
-    *(uint32_t *)base = val;
-    BARRIER();
-    return val;
-}
-
-void init_<INIT_FUNCTION>(void *base)
-{
-    <COMPONENT>.mIndexReadCallback = read_from_ram;
+    <COMPONENT>.mIndexReadCallback = read;
     <COMPONENT>.mIndexReadCallbackArgs = base;
 
-    <COMPONENT>.mIndexWriteCallback = write_to_ram;
+    <COMPONENT>.mIndexWriteCallback = write;
     <COMPONENT>.mIndexWriteCallbackArgs = base;
 
 <SERIALIZED>

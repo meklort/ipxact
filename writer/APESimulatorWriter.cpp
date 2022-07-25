@@ -220,16 +220,16 @@ string APESimulatorWriter::serialize_register_ape_definition(Component& componen
         decl << indent() << "for(int i = 0; i < " << dim << "; i++)" << endl;
         decl << indent() << "{" << endl;
         indent(1);
-        decl << indent() << basename << ".installReadCallback(loader_read_mem, (uint8_t *)base);" << endl;
-        decl << indent() << basename << ".installWriteCallback(loader_write_mem, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installReadCallback(read, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installWriteCallback(write, (uint8_t *)base);" << endl;
         indent(-1);
         decl << indent() << "}" << endl;
     }
     else
     {
         string basename = string(component.getName()) + string(".") + newname + string(".r") + to_string(width);
-        decl << indent() << basename << ".installReadCallback(loader_read_mem, (uint8_t *)base);" << endl;
-        decl << indent() << basename << ".installWriteCallback(loader_write_mem, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installReadCallback(read, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installWriteCallback(write, (uint8_t *)base);" << endl;
     }
 
     decl << endl;
@@ -383,7 +383,7 @@ bool APESimulatorWriter::write(Components& components)
     for(it = componentList.begin(); it != componentList.end(); it++)
     {
         Component* component = *it;
-        if(component) 
+        if(component)
         {
             status = status && writeComponent(*component);
         }
