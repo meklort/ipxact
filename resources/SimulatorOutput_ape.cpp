@@ -47,44 +47,17 @@
 #include <bcm5719_SHM.h>
 <INCLUDES>
 
-static uint32_t loader_read_mem(uint32_t val, uint32_t offset, void *args)
-{
-    uint32_t addr = (uint32_t)((uint64_t)args);
-    addr += offset;
-
-    SHM.LoaderArg0.r32 = addr;
-    SHM.LoaderCommand.bits.Command = SHM_LOADER_COMMAND_COMMAND_READ_MEM;
-
-    // Wait for command to be handled.
-    while(0 != SHM.LoaderCommand.bits.Command);
-
-    return (uint32_t)SHM.LoaderArg0.r32;
-}
-
-static uint32_t loader_write_mem(uint32_t val, uint32_t offset, void *args)
-{
-    uint32_t addr = (uint32_t)((uint64_t)args);
-    addr += offset;
-
-    SHM.LoaderArg0.r32 = addr;
-    SHM.LoaderArg1.r32 = val;
-    SHM.LoaderCommand.bits.Command = SHM_LOADER_COMMAND_COMMAND_WRITE_MEM;
-
-    // Wait for command to be handled.
-    while(0 != SHM.LoaderCommand.bits.Command);
-
-    return val;
-}
-
-void init_<INIT_FUNCTION>(void *arg0)
+void init_<INIT_FUNCTION>(void *arg0,
+    uint32_t (*read)(uint32_t val, uint32_t offset, void *args),
+    uint32_t (*write)(uint32_t val, uint32_t offset, void *args))
 {
     (void)arg0; // unused
     void* base = (void*)<BASE_ADDR>;
 
-    <COMPONENT>.mIndexReadCallback = loader_read_mem;
+    <COMPONENT>.mIndexReadCallback = read;
     <COMPONENT>.mIndexReadCallbackArgs = base;
 
-    <COMPONENT>.mIndexWriteCallback = loader_write_mem;
+    <COMPONENT>.mIndexWriteCallback = write;
     <COMPONENT>.mIndexWriteCallbackArgs = base;
 
 <SERIALIZED>

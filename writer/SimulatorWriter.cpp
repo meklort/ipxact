@@ -260,8 +260,8 @@ string SimulatorWriter::serialize_register_mmap_definition(Component& component,
             decl << indent() << "for(int i = 0; i < " << std::dec << padding << "; i++)" << endl;
             decl << indent() << "{" << endl;
             indent(1);
-            decl << indent() << basename << std::dec << expStart << "[i].installReadCallback(read_from_ram, (uint8_t *)base);" << endl;
-            decl << indent() << basename << std::dec << expStart << "[i].installWriteCallback(write_to_ram, (uint8_t *)base);" << endl;
+            decl << indent() << basename << std::dec << expStart << "[i].installReadCallback(read, (uint8_t *)base);" << endl;
+            decl << indent() << basename << std::dec << expStart << "[i].installWriteCallback(write, (uint8_t *)base);" << endl;
             decl << indent(-1) << "}" << endl;
         }
         else
@@ -302,16 +302,16 @@ string SimulatorWriter::serialize_register_mmap_definition(Component& component,
         decl << indent() << "for(int i = 0; i < " << dim << "; i++)" << endl;
         decl << indent() << "{" << endl;
         indent(1);
-        decl << indent() << basename << ".installReadCallback(read_from_ram, (uint8_t *)base);" << endl;
-        decl << indent() << basename << ".installWriteCallback(write_to_ram, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installReadCallback(read, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installWriteCallback(write, (uint8_t *)base);" << endl;
         indent(-1);
         decl << indent() << "}" << endl;
     }
     else
     {
         string basename = string(component.getName()) + string(".") + newname + string(".r") + to_string(width);
-        decl << indent() << basename << ".installReadCallback(read_from_ram, (uint8_t *)base);" << endl;
-        decl << indent() << basename << ".installWriteCallback(write_to_ram, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installReadCallback(read, (uint8_t *)base);" << endl;
+        decl << indent() << basename << ".installWriteCallback(write, (uint8_t *)base);" << endl;
     }
 
     decl << endl;
